@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Attendance Summary - FaceCheck Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar-custom {
+            background-color: #339CFF;
+        }
+        .navbar-custom .navbar-brand,
+        .navbar-custom .btn-outline-light {
+            color: white;
+        }
+
+        .table thead th {
+            background-color: #68b4fb !important;
+            color: white !important;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .table td, .table th {
+            padding: 12px 14px;
+            font-size: 0.95rem;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .roll-bold {
+            font-weight: bold;
+        }
+
+        .low-attendance-name {
+            background-color: #f8d7da !important;
+            color: red !important;
+            font-weight: bold;
+            border: 1px solid #f5c2c7 !important;
+        }
+
+        .overall {
+            font-weight: bold;
+        }
+
+        .class-table {
+            margin-bottom: 3rem;
+        }
+
+        /* Filter area */
+        .filter-container {
+            margin-bottom: 20px;
+        }
+
+        .threshold-label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">FaceCheck Admin</a>
+        <div class="d-flex">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-light btn-sm me-2">Dashboard</a>
+            <a href="{{ url_for('admin_logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h3 class="mb-4 text-center">All Students Attendance Summary</h3>
+
+    <!-- Filters -->
+<div class="row filter-container justify-content-center g-3">
+    <div class="col-md-2">
+        <select id="classFilter" class="form-select form-select-sm">
+            <option value="">All Classes</option>
+            {% for c in classes %}
+                <option value="{{ c }}" {% if selected_class == c %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <input type="text" id="rollFilter" class="form-control form-control-sm" placeholder="Roll No" value="{{ selected_roll }}">
+    </div>
+    <div class="col-md-2">
+        <select id="thresholdSelect" class="form-select form-select-sm">
+            <option value="25">25%</option>
+            <option value="50">50%</option>
+            <option value="75" selected>75%</option>
+        </select>
+    </div>
+</div>
+
+    <!-- Class-wise tables -->
+    {% for c, students in summary_by_class.items() %}
+    <div class="class-table" data-class="{{ c }}">
+        <h4 class="mb-3">{{ c }}</h4>
+        <table class="table table-bordered table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Roll No</th>
+                    <th>Name</th>
+                    {% for subject in subjects %}
+                        <th>{{ subject }}</th>
+                    {% endfor %}
+                    <th>Overall %</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students|sort(attribute='roll_no') %}
+                <tr data-overall="{{ student.overall_percent }}">
+                    <td class="roll-bold">{{ student.roll_no }}</td>
+                    <td>{{ student.student }}</td>
+                    {% for s in student.summary %}
+                        <td>{{ s.percent }}%</td>
+                    {% endfor %}
+                    <td class="overall">{{ student.overall_percent }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endfor %}
+
+</div>
+
+<script>
+const classFilter = document.getElementById('classFilter');
+const rollFilter = document.getElementById('rollFilter');
+const thresholdSelect = document.getElementById('thresholdSelect');
+const classTables = document.querySelectorAll('.class-table');
+
+function updateHighlight() {
+    const threshold = parseInt(thresholdSelect.value);
+    classTables.forEach(table => {
+        table.querySelectorAll('tbody tr').forEach(row => {
+            const overall = parseFloat(row.dataset.overall);
+            const nameCell = row.cells[1];
+            if(overall < threshold) {
+                nameCell.classList.add('low-attendance-name');
+            } else {
+                nameCell.classList.remove('low-attendance-name');
+            }
+        });
+    });
+}
+
+function filterStudents() {
+    const classVal = classFilter.value.toLowerCase();
+    const rollVal = rollFilter.value.toLowerCase();
+
+    classTables.forEach(table => {
+        const tableClass = table.dataset.class.toLowerCase();
+        let showClass = (classVal === '' || tableClass === classVal);
+
+        table.style.display = showClass ? '' : 'none';
+
+        if (showClass && rollVal !== '') {
+            table.querySelectorAll('tbody tr').forEach(row => {
+                const roll = row.querySelector('td').innerText.toLowerCase();
+                row.style.display = roll.includes(rollVal) ? '' : 'none';
+            });
+        } else if (showClass) {
+            table.querySelectorAll('tbody tr').forEach(row => row.style.display = '');
+        }
+    });
+
+    updateHighlight();
+}
+
+// Event listeners
+classFilter.addEventListener('change', filterStudents);
+rollFilter.addEventListener('input', filterStudents);
+thresholdSelect.addEventListener('change', filterStudents);
+
+// Initial highlighting
+filterStudents();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

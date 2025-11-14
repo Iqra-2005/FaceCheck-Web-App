@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Set Total Lectures - FaceCheck Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar-custom {
+            background-color: #339CFF;
+        }
+        .table-header-custom {
+            background-color: #339CFF;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">FaceCheck Admin</a>
+        <div class="d-flex">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-light btn-sm me-2">Dashboard</a>
+            <a href="{{ url_for('admin_logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h3 class="mb-4 text-center">Set Total Lectures per Subject</h3>
+
+    <form method="POST" class="row g-3 justify-content-center mb-4">
+        <div class="col-md-4">
+            <select name="subject" class="form-select" required>
+                <option value="">Select Subject</option>
+                {% for sub in subjects %}
+                    <option value="{{ sub }}">{{ sub }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <input type="number" name="total" class="form-control" placeholder="Total Lectures" min="0" required>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary">Set / Update</button>
+        </div>
+    </form>
+
+    <h5 class="mb-3">Current Total Lectures</h5>
+    {% if total_lectures %}
+    <table class="table table-bordered table-striped">
+        <thead class="table-header-custom">
+            <tr>
+                <th>Subject</th>
+                <th>Total Lectures</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for subject, total in total_lectures.items() %}
+            <tr>
+                <td>{{ subject }}</td>
+                <td>{{ total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="alert alert-info">No subjects have lectures set yet.</div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

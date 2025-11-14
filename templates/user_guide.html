@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FaceCheck Student Guide</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .section-card {
+            margin-top: 40px;
+        }
+        .instruction-list li {
+            margin-bottom: 15px;
+            font-size: 18px; /* increased text size */
+        }
+        .card h4 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px; /* bigger card title */
+        }
+        .back-home-btn {
+            margin-top: 40px;
+            text-align: center;
+        }
+        .student-card {
+            background-color: #e0f7fa; /* light cyan */
+            padding: 30px; /* bigger card padding */
+        }
+        .guide-container {
+            display: flex;
+            justify-content: center; /* center the card */
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        .guide-card {
+            flex: 1 1 500px; /* responsive width */
+            max-width: 700px; /* increased max width */
+        }
+        /* Note box styling with gradient */
+        .note-box {
+            background: linear-gradient(90deg, #e0f0ff, #ffffff); /* soft blue gradient */
+            border-left: 6px solid #339CFF; /* blue left border */
+            padding: 25px 30px; /* increased padding */
+            max-width: 700px;  /* bigger width */
+            margin: 25px auto 0 auto;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+            border-radius: 6px;
+            font-size: 18px; /* bigger text */
+            font-weight: 500;
+            line-height: 1.6; /* spacing between lines */
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg" style="background-color: #339CFF;">
+    <div class="container-fluid">
+        <a class="navbar-brand text-white" href="{{ url_for('index') }}">FaceCheck</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <!-- Instructions in centered single column layout -->
+    <div class="guide-container">
+        <!-- Students Card -->
+        <div class="card shadow rounded-3 section-card student-card guide-card">
+            <div class="card-body">
+                <h4>For Students</h4>
+                <ol class="instruction-list">
+                    <li><strong>Registration:</strong> Go to the Register page. Fill in Full Name, Roll Number, Class, Set a Username, and Password (Kindly remember them). Capture 3–5 images of your face using the webcam before submitting.</li>
+                    <li><strong>Login:</strong> Go to the Login page. Enter your username and password. Click Login to access your dashboard.</li>
+                    <li><strong>Dashboard:</strong> View your attendance records, listed with Date, Subject, and Class. Attendance is automatically updated by the admin.</li>
+                    <li><strong>Logout:</strong> Click Logout to securely exit your account.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- Note Box -->
+    <div class="note-box">
+        <strong>Note:</strong> Attendance is marked for <u>registered students only</u>. Make sure you have registered with proper and clear images. Avoid duplicate registration. <br><br>
+        <strong>Important:</strong> Avoid using the Admin Login feature; this is only for faculty members.
+    </div>
+
+    <!-- Back to Home Button -->
+    <div class="back-home-btn">
+        <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">Back to Home</a>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

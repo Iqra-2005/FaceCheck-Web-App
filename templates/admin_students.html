@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Database - Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar-custom { background-color: #339CFF; }
+        .navbar-custom .navbar-brand,
+        .navbar-custom .btn-outline-light { color: white; }
+        #studentsTable thead { background-color: #339CFF; color: white; }
+
+        /* Right corner delete panel */
+        .delete-panel {
+            position: absolute;
+            top: 70px;   /* below navbar */
+            right: 20px;
+            width: 350px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">FaceCheck Admin</a>
+        <div class="d-flex">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-light btn-sm me-2">Dashboard</a>
+            <a href="{{ url_for('admin_logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h3 class="mb-3 text-center">Student Database</h3>
+
+    <!-- 🔹 Filters row -->
+    <div class="row g-3 mb-3 justify-content-center">
+        <div class="col-md-3">
+            <input type="text" id="rollFilter" class="form-control" placeholder="Search by Roll No">
+        </div>
+        <div class="col-md-3">
+            <select id="classFilter" class="form-select">
+                <option value="">All Classes</option>
+                {% for cls in classes %}
+                <option value="{{ cls }}">{{ cls }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- 🔹 Student Table -->
+    <table class="table table-striped table-bordered" id="studentsTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Full Name</th>
+                <th>Roll No</th>
+                <th>Class</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if students %}
+            {% for student in students %}
+            <tr data-roll="{{ student.roll_no }}" data-class="{{ student.class_name }}">
+                <td>{{ student.id }}</td>
+                <td>{{ student.full_name }}</td>
+                <td>{{ student.roll_no }}</td>
+                <td>{{ student.class_name }}</td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="4" class="text-center">No students found.</td></tr>
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<!-- 🔹 Delete Panel (top-right corner) -->
+<div class="delete-panel">
+    <div class="card shadow-sm" style="width: 350px;">
+        <div class="card-body">
+            <h6 class="text-danger fw-bold mb-3 text-center">Manage Students</h6>
+
+            <!-- Delete Single -->
+            <form method="POST" action="{{ url_for('admin_delete_student') }}" class="mb-3">
+                <div class="input-group input-group-sm">
+                    <input type="text" name="roll_no" class="form-control" placeholder="Roll No" required>
+                    <button type="submit" class="btn btn-outline-danger"
+                            onclick="return confirm('Delete this student?');">Delete</button>
+                </div>
+            </form>
+
+            <!-- Delete Class -->
+            <form method="POST" action="{{ url_for('admin_delete_class_students') }}" onsubmit="return setDeleteClass();" class="mb-3">
+                <input type="hidden" name="class_name" id="deleteClassInput">
+                <button type="submit" class="btn btn-warning w-100 btn-sm">Delete Class Students</button>
+            </form>
+
+            <!-- Delete All -->
+            <form method="POST" action="{{ url_for('admin_delete_all_students') }}">
+                <button type="submit" class="btn btn-danger w-100 btn-sm"
+                        onclick="return confirm('Are you sure you want to delete ALL students?');">
+                    Delete All Students
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+// 🔹 Dynamic filtering
+const rollInput = document.getElementById('rollFilter');
+const classSelect = document.getElementById('classFilter');
+const table = document.getElementById('studentsTable');
+
+function filterStudents() {
+    const rollVal = rollInput.value.trim().toLowerCase();
+    const classVal = classSelect.value;
+    for (const row of table.tBodies[0].rows) {
+        const rowRoll = row.dataset.roll.toLowerCase();
+        const rowClass = row.dataset.class;
+        row.style.display = (
+            (rollVal === '' || rowRoll.includes(rollVal)) &&
+            (classVal === '' || rowClass === classVal)
+        ) ? '' : 'none';
+    }
+}
+rollInput.addEventListener('input', filterStudents);
+classSelect.addEventListener('change', filterStudents);
+
+// 🔹 Pass selected class to delete form
+function setDeleteClass() {
+    const v = document.getElementById('classFilter').value;
+    document.getElementById('deleteClassInput').value = v;
+    if (!v) { alert("Please select a class first."); return false; }
+    return confirm("Are you sure you want to delete all students in class " + v + "?");
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

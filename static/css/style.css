@@ -1,0 +1,140 @@
+/* ---------- General ---------- */
+body {
+    background-color: #f5f7fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* ---------- Containers ---------- */
+.container {
+    margin-top: 50px;
+    text-align: center;
+}
+
+/* ---------- Headings ---------- */
+h1, h2, h3, h4, h5, h6 {
+    color: #34495e;
+    font-weight: 600;
+}
+
+/* ---------- Navbar ---------- */
+.navbar {
+    background-color: #4a90e2; /* soft professional blue */
+}
+.navbar a.navbar-brand,
+.navbar .btn {
+    color: #fff !important;
+}
+.navbar .btn:hover {
+    background-color: #357ab8 !important;
+}
+
+/* ---------- Buttons ---------- */
+.btn, .dashboard-btn {
+    border-radius: 12px;
+    background: linear-gradient(135deg, #6fb1fc, #a1d1ff);
+    color: #fff;
+    font-weight: 500;
+    font-size: 1.05rem;
+    padding: 12px 20px;
+    margin: 10px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.btn:hover, .dashboard-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    background: linear-gradient(135deg, #5aa0e0, #8fcfff);
+    color: #fff;
+}
+
+/* ---------- Tables ---------- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px auto;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
+}
+
+table th, table td {
+    padding: 12px 15px;
+}
+
+table th {
+    background-color: #4a90e2;
+    color: #fff;
+    font-weight: 600;
+}
+
+table tr:nth-child(even) {
+    background-color: #f1f7ff;
+}
+
+table tr:hover {
+    background-color: #d0e4ff;
+}
+
+/* ---------- Cards ---------- */
+.card {
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    margin: 20px auto;
+    padding: 15px;
+    text-align: center;
+}
+
+/* ---------- Forms ---------- */
+input, select, textarea {
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    font-size: 1rem;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 5px rgba(74,144,226,0.5);
+}
+
+/* ---------- Utility Classes ---------- */
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.mt-2 { margin-top: 10px; }
+.mt-3 { margin-top: 20px; }
+.mb-2 { margin-bottom: 10px; }
+.mb-3 { margin-bottom: 20px; }
+
+/* ---------- Links ---------- */
+a {
+    color: #4a90e2;
+    text-decoration: none;
+}
+a:hover {
+    color: #357ab8;
+    text-decoration: underline;
+}
+
+/* ---------- Responsive Buttons ---------- */
+@media (max-width: 768px) {
+    .dashboard-btn, .btn {
+        width: 80%;
+        margin: 10px auto;
+    }
+}

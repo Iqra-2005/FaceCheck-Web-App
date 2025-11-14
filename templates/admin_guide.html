@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Guide - FaceCheck</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Navbar */
+        .navbar-custom {
+            background-color: #339CFF;
+        }
+        .navbar-custom .navbar-brand,
+        .navbar-custom .btn-outline-light {
+            color: white;
+        }
+
+        /* Admin Guide Card */
+        .guide-card {
+            max-width: 750px;
+            margin: 100px auto;
+            padding: 30px;
+            border-radius: 15px;
+            background-color: #D8EEFF; /* very light blue */
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+        .guide-card h2 {
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #34495e;
+        }
+        .guide-card p {
+            font-size: 1.05rem;
+            color: #4b4b4b;
+            line-height: 1.6;
+        }
+        .guide-card ol {
+            text-align: left;
+            padding-left: 20px;
+            margin-top: 15px;
+        }
+        .guide-card li {
+            margin-bottom: 10px;
+        }
+        .important-note {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #ffffff; /* light orange for important note */
+            border-left: 5px solid #339CFF;
+            text-align: left;
+            color: #4b4b4b;
+            font-weight: 500;
+            border-radius: 8px;
+        }
+        .back-btn {
+            margin-top: 25px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">FaceCheck</a>
+        <div class="d-flex ms-auto">
+            <a href="{{ url_for('admin_guide') }}" class="btn btn-outline-light btn-sm">Admin Guide</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Admin Guide Card -->
+<div class="guide-card text-center">
+    <h2>Admin Guide</h2>
+    <p>Welcome to the FaceCheck Admin Panel! Below is a quick guide for each feature available on your dashboard:</p>
+    
+    <ol>
+        <li><strong>Mark Attendance:</strong> Capture student attendance in real-time using the camera. Ensure students are registered and their faces are visible for accurate recognition.</li>
+        <li><strong>Student Database:</strong> View all students, filter by roll number or class. You can also delete all student records.</li>
+        <li><strong>Attendance Records:</strong> View historical attendance data. Filter by date or student roll number to monitor attendance trends.</li>
+        <li><strong>Set Total Lectures:</strong> Update the total number of lectures for each subjects. This will reflect in attendance summaries and reports.</li>
+        <li><strong>Attendance Summary:</strong> Make sure to upadte total lectures for each subject in "Set Total Lectures" to,  Review summarized attendance for each student and class. Check attendance percentages and trends.</li>
+        <li><strong>Admin Settings:</strong> Change your password or add additional admin accounts. Manage existing admin accounts safely.</li>
+    </ol>
+
+    <div class="important-note">
+        <strong>Important:</strong> At the beginning of each new academic year, ensure that the <strong>Subjects table</strong> in "Mark Attendance", the <strong>Attendance table</strong> in "Attendance Records", and the <strong>Students table</strong> in "Student Database" are cleared. This avoids confusion between old and new records. After clearing, all students will need to <strong>re-register</strong> to participate in attendance marking.
+    </div>
+
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary back-btn">
+        <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+</body>
+</html>

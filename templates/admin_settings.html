@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Settings - FaceCheck</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    .navbar-custom {
+        background-color: #339CFF;
+    }
+    .card {
+        border-radius: 12px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .card-title {
+        font-weight: bold;
+    }
+    .card-change-password {
+        background-color: #D0E7FF; /* light blue */
+    }
+    .card-add-admin {
+        background-color: #DFF7D8; /* light green */
+    }
+    .row-equal {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .row-equal > .col-md-6 {
+        display: flex;
+        flex-direction: column;
+    }
+    .row-equal .card {
+        flex: 1;
+    }
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">FaceCheck Admin</a>
+        <div class="d-flex">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-light btn-sm me-2">Dashboard</a>
+            <a href="{{ url_for('admin_logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5">
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              {{ msg }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="row row-equal">
+        <!-- Change Password Form -->
+        <div class="col-md-6 mb-4">
+            <div class="card p-4 card-change-password">
+                <h4 class="mb-3 card-title">Change Password</h4>
+                <form method="POST" action="{{ url_for('admin_settings') }}">
+                    <input type="hidden" name="action" value="change_password">
+                    <div class="mb-3">
+                        <label class="form-label">Current Password</label>
+                        <input type="password" name="current_password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">New Password</label>
+                        <input type="password" name="new_password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Confirm New Password</label>
+                        <input type="password" name="confirm_password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Update Password</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Add Admin Form -->
+        <div class="col-md-6 mb-4">
+            <div class="card p-4 card-add-admin">
+                <h4 class="mb-3 card-title">Add New Admin</h4>
+                <form method="POST" action="{{ url_for('admin_settings') }}">
+                    <input type="hidden" name="action" value="add_admin">
+                    <div class="mb-3">
+                        <label class="form-label">Admin Email</label>
+                        <input type="email" name="new_admin_email" class="form-control" placeholder="Enter admin email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="new_admin_password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Add Admin</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admins Table -->
+    <div class="card p-4 mt-4">
+        <h4 class="mb-3 card-title">Existing Admins</h4>
+        <table class="table table-bordered table-striped text-center align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for admin in admins %}
+                <tr>
+                    <td>{{ admin.id }}</td>
+                    <td>{{ admin.email }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('admin_settings') }}" style="display:inline;">
+                            <input type="hidden" name="action" value="delete_admin">
+                            <input type="hidden" name="admin_id" value="{{ admin.id }}">
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('Are you sure you want to delete this admin?')"
+                                    {% if admin.email == session['admin_email'] %}disabled{% endif %}>
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" class="text-muted">No admins found</td>
+                </tr>
+                {% endfor %} 
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

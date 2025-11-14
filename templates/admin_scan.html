@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Live Attendance - FaceCheck</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script async src="https://docs.opencv.org/4.x/opencv.js"></script>
+
+<style>
+  body {
+    text-align: center;
+    background-color: #f8f9fa;
+  }
+  .center-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+  }
+  #videoContainer {
+    position: relative;
+    display: inline-block;
+    margin-top: 20px;
+  }
+  #overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  #markedStudents {
+    margin-top: 20px;
+    width: 300px;
+  }
+  #markBtn {
+    margin-top: 20px;
+    width: 200px;
+  }
+  #subjectSelect, #newSubjectInput {
+    margin-top: 10px;
+    width: 200px;
+  }
+  #clearSubjectsBtn {
+    position: absolute;
+    top: 80px;
+    right: 20px;
+  }
+  /* Navbar color update */
+  .navbar-custom {
+    background-color: #339CFF; /* medium blue */
+  }
+  .navbar-custom .navbar-brand,
+  .navbar-custom .btn-outline-light {
+    color: white;
+  }
+</style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">FaceCheck Admin</a>
+        <div class="d-flex">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-light btn-sm me-2">Dashboard</a>
+            <a href="{{ url_for('admin_logout') }}" class="btn btn-outline-light btn-sm">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Clear Subjects Button -->
+<div class="d-flex justify-content-end me-3 mt-2">
+    <button id="clearSubjectsBtn" class="btn btn-danger btn-sm">
+        <i class="fa-solid fa-trash"></i> Clear Subjects
+    </button>
+</div>
+
+<div class="center-container">
+
+  <h3>Live Attendance</h3>
+
+  <!-- Info message -->
+  <div class="alert alert-warning mt-2 w-75 text-center mx-auto" role="alert">
+    The model may misrecognize you. Please ensure you are registered and verify your name while marking attendance.
+  </div>
+
+  <!-- Subject Dropdown -->
+  <div>
+    <label class="fw-bold">Subject:</label>
+    <br>
+    <select id="subjectSelect" class="form-select">
+      {% for s in subjects %}
+        <option value="{{ s }}">{{ s }}</option>
+      {% endfor %}
+      <option value="__new__">Add New Subject</option>
+    </select>
+    <br>
+    <input type="text" id="newSubjectInput" class="form-control d-none" placeholder="Enter new subject">
+  </div>
+
+  <!-- Live Camera Feed -->
+  <div id="videoContainer">
+    <video id="video" width="640" height="480" autoplay class="border rounded shadow"></video>
+    <canvas id="overlay" width="640" height="480"></canvas>
+  </div>
+
+  <!-- Mark Attendance Button -->
+  <button id="markBtn" class="btn btn-success">Mark Attendance</button>
+
+  <!-- Marked Students List -->
+  <div id="markedStudents"></div>
+
+</div>
+
+<audio id="successSound" src="{{ url_for('static', filename='success.mp3') }}" preload="auto"></audio>
+
+<script>
+const video = document.getElementById('video');
+const overlay = document.getElementById('overlay');
+const ctx = overlay.getContext('2d');
+const subjectSelect = document.getElementById('subjectSelect');
+const newSubjectInput = document.getElementById('newSubjectInput');
+const markedDiv = document.getElementById('markedStudents');
+const successSound = document.getElementById('successSound');
+const markBtn = document.getElementById('markBtn');
+const clearSubjectsBtn = document.getElementById('clearSubjectsBtn');
+
+let recognizedFaces = [];
+let alreadyMarkedCache = new Set(); // Keep track of already marked students
+
+// Show/hide new subject input
+function toggleNewSubject() {
+  if(subjectSelect.value==='__new__'){
+    newSubjectInput.classList.remove('d-none');
+  } else {
+    newSubjectInput.classList.add('d-none');
+    newSubjectInput.value='';
+  }
+}
+subjectSelect.addEventListener('change', toggleNewSubject);
+toggleNewSubject();
+
+// Start webcam
+navigator.mediaDevices.getUserMedia({video:true})
+.then(stream => video.srcObject = stream)
+.catch(err => alert("Webcam not accessible: "+err));
+
+// Draw faces with Full Name, Roll No, Class
+function drawFaces() {
+  ctx.clearRect(0, 0, overlay.width, overlay.height);
+
+  for (let face of recognizedFaces) {
+    if (face.name && face.name !== "Unknown") {
+      // Recognized user → green box
+      ctx.strokeStyle = 'lime';
+      ctx.fillStyle = 'lime';
+    } else {
+      // Unknown user → red box
+      ctx.strokeStyle = 'red';
+      ctx.fillStyle = 'red';
+    }
+
+    ctx.lineWidth = 3;
+    ctx.strokeRect(face.rect.x, face.rect.y, face.rect.width, face.rect.height);
+
+    // Prepare label
+    let labelName = face.name || "Unknown";
+    let labelRoll = face.roll_no || "Unknown";
+    let labelClass = face.class_name || "Unknown";
+
+    let labelText = `${labelRoll} - ${labelName} (${labelClass})`;
+    ctx.font = "16px Arial";
+    ctx.fillText(labelText, face.rect.x, face.rect.y - 5);
+  }
+}
+
+
+// Capture and recognize faces
+async function detectFaces() {
+  if(!video.videoWidth || !video.videoHeight) return;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const tempCtx = canvas.getContext('2d'); 
+  tempCtx.drawImage(video,0,0,canvas.width,canvas.height);
+  const imgData = canvas.toDataURL('image/jpeg');
+
+  try {
+    const res = await axios.post('{{ url_for("recognize_face") }}', {image: imgData});
+    recognizedFaces = [];
+    
+    // Always push detected face, even if unknown
+    recognizedFaces.push({
+      name: res.data.full_name || "Unknown",
+      roll_no: res.data.roll_no || "",
+      class_name: res.data.class_name || "",
+      rect: {x: 220, y: 140, width: 200, height: 200} // placeholder box
+    });
+
+    drawFaces();
+
+  } catch(err) {
+    console.error(err);
+  }
+}
+
+
+// Continuous detection
+setInterval(detectFaces, 700);
+
+// Mark attendance on button click
+markBtn.addEventListener('click', async () => {
+  if(recognizedFaces.length === 0) return alert("No recognized student to mark.");
+
+  let subject = subjectSelect.value;
+  if(subject==='__new__'){
+    subject = newSubjectInput.value.trim();
+    if(!subject) return alert("Enter a subject name");
+  }
+
+  // Filter recognized faces not already marked in this session
+  const facesToMark = recognizedFaces.filter(f => !alreadyMarkedCache.has(f.roll_no));
+  if(facesToMark.length === 0) return alert("All recognized students are already marked for today.");
+
+  try {
+    const images = facesToMark.map(f => {
+      const c = document.createElement('canvas');
+      c.width = video.videoWidth;
+      c.height = video.videoHeight;
+      c.getContext('2d').drawImage(video, 0, 0, c.width, c.height);
+      return c.toDataURL('image/jpeg');
+    });
+
+    const res = await axios.post('{{ url_for("admin_scan") }}', {subject: subject, images: images});
+    if(res.data.status==='ok'){
+      let html = '';
+
+      if(res.data.marked.length > 0){
+        html += `<h5 class="text-success">Marked Students:</h5>`;
+        html += `<ul class="list-group mb-2">` + res.data.marked.map(n=>{
+          alreadyMarkedCache.add(n.roll_no); // Update cache
+          return `<li class="list-group-item">${n.roll_no} - ${n.full_name} (${n.class_name})</li>`;
+        }).join('') + `</ul>`;
+        successSound.play();
+      }
+
+      if(res.data.already_marked.length > 0){
+        html += `<h5 class="text-warning">Already Marked:</h5>`;
+        html += `<ul class="list-group">` + res.data.already_marked.map(n=>
+          `<li class="list-group-item">${n.roll_no} - ${n.full_name} (${n.class_name})</li>`).join('') + `</ul>`;
+      }
+
+      markedDiv.innerHTML = html;
+    } else {
+      alert(res.data.message);
+    }
+
+  } catch(err){
+    console.error(err);
+    alert("Error marking attendance");
+  }
+});
+
+// Clear Subjects button
+clearSubjectsBtn.addEventListener('click', async () => {
+    if(!confirm("Are you sure you want to delete all subjects?")) return;
+
+    try {
+        const res = await axios.post('/api/clear_subjects');
+        if(res.data.status === 'ok'){
+            alert("All subjects have been cleared.");
+            Array.from(subjectSelect.options).forEach(opt=>{
+                if(opt.value !== '__new__') opt.remove();
+            });
+            subjectSelect.value = '__new__';
+            toggleNewSubject();
+        } else alert("Error clearing subjects.");
+    } catch(err){
+        console.error(err);
+        alert("Error clearing subjects.");
+    }
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+</body>
+</html>
