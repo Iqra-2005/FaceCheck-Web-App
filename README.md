@@ -90,7 +90,7 @@ iii) Install dependencies
 
     pip install -r requirements.txt
   
-iv) (Optional) Add your custom embedding model
+iv) Add your custom embedding model
   
     Place embedding_model.h5 in the project folder and update the model path in the code.
       
@@ -107,7 +107,7 @@ Open in browser: http://127.0.0.1:5000/
     ├─ db_utils.py           # Database utilities
     ├─ requirements.txt      # Python dependencies
     ├─ face_attendance.db    # SQLite database
-    │_embedding_model.H5     # Siamese Model for embedding generation
+    │_embedding_model.H5     # Siamese Model for embedding generation (not present in the current repo)
     |
     ├─ templates/            # HTML templates
     │   ├─ register.html
