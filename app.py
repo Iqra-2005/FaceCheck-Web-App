@@ -18,7 +18,7 @@ from db_utils import (
 
 # --- Flask initialization---
 app = Flask(__name__)
-app.secret_key = 'a_secret'
+app.secret_key = 'add_a_key_here'
 
 # --- DB Init ---
 init_db()
@@ -885,3 +885,4 @@ def api_users():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True, threaded=True)
+
