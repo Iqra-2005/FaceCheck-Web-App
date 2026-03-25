@@ -1,7 +1,7 @@
 # 🌐 FaceCheck – AI-Based Smart Attendance System
 
 A web-based attendance system using facial recognition. The system allows users to register their face (multiple frames per person), stores embeddings, and recognises faces in real-time to mark attendance automatically, works on multiple devices and asures user security by avoiding the storage of user images.
----
+
 
 ## 📝 Features
 
