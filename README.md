@@ -1,9 +1,9 @@
-# 🌐 FaceCheck – AI-Based Smart Attendance System
+#  FaceCheck – AI-Based Smart Attendance System
 
 A web-based attendance system using facial recognition. The system allows users to register their face (multiple frames per person), stores embeddings, and recognises faces in real-time to mark attendance automatically, works on multiple devices and asures user security by avoiding the storage of user images.
 
 
-## 📝 Features
+##  Features
 
 - **Face Registration**: Capture multiple frames of a person’s face, generate embeddings, and store them along with metadata (name, roll number, class).
 
@@ -16,7 +16,7 @@ A web-based attendance system using facial recognition. The system allows users 
 - **Extensible**: Can integrate a custom embedding model (e.g., Siamese network) for improved accuracy.
 
 ---
-## 🛠 System Overview
+##  System Overview
 
  **1)Registration Phase**
 
@@ -66,7 +66,7 @@ A web-based attendance system using facial recognition. The system allows users 
 
 ---
 
-## ✅ Getting Started
+##  Getting Started
 **1)Prerequisites**
 
 - Python 3.x
@@ -105,7 +105,7 @@ Open in browser: http://127.0.0.1:5000/
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
     FaceCheck-Web-App/
     │
@@ -127,7 +127,7 @@ Open in browser: http://127.0.0.1:5000/
 
 ---
 
-## 🎯 How to Use
+##  How to Use
 
 **1) Register a New User**
 
@@ -157,7 +157,7 @@ Open in browser: http://127.0.0.1:5000/
 
 ---
 
-## 📝 Notes
+##  Notes
 
 - Created as an academic project for TY BSc Data Science & AI (2025–2026).
 
